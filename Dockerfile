@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1
 
 # get OSX SDK
-ARG OSXCROSS_VERSION=latest
+ARG OSXCROSS_VERSION=13.1-r0
 FROM crazymax/osxcross:${OSXCROSS_VERSION}-ubuntu AS osxcross
 
 FROM ubuntu:20.04
