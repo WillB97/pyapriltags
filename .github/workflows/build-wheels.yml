@@ -2,9 +2,6 @@ name: Build Wheels
 
 on:
   push:
-    branches: [ "master", "ci" ]
-  pull_request:
-    branches: [ "master" ]
 
 jobs:
   build-image:
@@ -15,9 +12,12 @@ jobs:
         submodules: recursive
         fetch-depth: 0
         fetch-tags: true
-    - name: Build the wheels (& Docker image)
-      run: make build
+    - name: Pull the latest image
+      run: docker pull ghcr.io/willb97/pyapriltags:latest
+    - name: Build the wheels
+      run: docker run --rm -v .:/apriltag -v ./dist:/out ghcr.io/willb97/pyapriltags:latest
     - uses: actions/upload-artifact@v4.3.6
+      if: always()
       with:
         name: wheels
         path: dist
