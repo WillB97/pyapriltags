@@ -1,0 +1,23 @@
+name: Build Wheels
+
+on:
+  push:
+
+jobs:
+  build-image:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        submodules: recursive
+        fetch-depth: 0
+        fetch-tags: true
+    - name: Pull the latest image
+      run: docker pull ghcr.io/willb97/pyapriltags:latest
+    - name: Build the wheels
+      run: docker run --rm -v .:/apriltag -v ./dist:/out ghcr.io/willb97/pyapriltags:latest
+    - uses: actions/upload-artifact@v4.3.6
+      if: always()
+      with:
+        name: wheels
+        path: dist
