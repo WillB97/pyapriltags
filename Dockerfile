@@ -6,7 +6,7 @@ FROM crazymax/osxcross:${OSXCROSS_VERSION}-ubuntu AS osxcross
 
 FROM ubuntu:20.04
 ENV PATH="/osxcross/bin:$PATH"
-ENV LD_LIBRARY_PATH="/osxcross/lib:$LD_LIBRARY_PATH"
+ENV LD_LIBRARY_PATH="/osxcross/lib"
 COPY --from=osxcross /osxcross /osxcross
 
 ARG DEBIAN_FRONTEND=noninteractive
