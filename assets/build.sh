@@ -5,7 +5,7 @@
 # TODO quit if /apriltag doesn't exist
 
 mkdir -p \
-    /{builds,dist}/{win64,mac_aarch64,mac_amd64,linux_amd64,linux_aarch64,linux_armhf}
+    /{builds,dist}/{win64,win32,mac_aarch64,mac_amd64,linux_amd64,linux_aarch64,linux_armhf}
 mkdir out
 
 COMMON_CMAKE_ARGS="-DBUILD_SHARED_LIBS=ON -DCMAKE_C_COMPILER_WORKS=1 -DCMAKE_CXX_COMPILER_WORKS=1 -DCMAKE_BUILD_TYPE=Release"
@@ -28,6 +28,7 @@ build_wheel() {
 }
 
 do_compile win64 x86_64-w64-mingw32-gcc x86_64-w64-mingw32-g++ "-DCMAKE_SYSTEM_NAME=Windows"
+do_compile win32 i686-w64-mingw32-gcc i686-w64-mingw32-g++ "-DCMAKE_SYSTEM_NAME=Windows"
 do_compile mac_aarch64 oa64-clang oa64-clang++ "-DCMAKE_SYSTEM_NAME=Darwin -DCMAKE_OSX_ARCHITECTURES=arm64"
 do_compile mac_amd64 o64-clang o64-clang++ "-DCMAKE_SYSTEM_NAME=Darwin -DCMAKE_OSX_ARCHITECTURES=x86_64"
 ARCH="$(uname -m)"
@@ -46,5 +47,6 @@ build_wheel linux_aarch64 libapriltag.so manylinux2014_aarch64
 build_wheel linux_amd64 libapriltag.so manylinux2010_x86_64
 build_wheel linux_armhf libapriltag.so manylinux2014_armv7l
 build_wheel win64 libapriltag.dll win-amd64
+build_wheel win32 libapriltag.dll win32
 build_wheel mac_aarch64 libapriltag.dylib macosx_11_0_arm64
 build_wheel mac_amd64 libapriltag.dylib macosx_11_0_x86_64

@@ -14,6 +14,7 @@ ARG DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && apt-get install -y clang lld libc6-dev \
     cmake make libtool gcc g++ \
     gcc-mingw-w64-x86-64 g++-mingw-w64-x86-64 \
+    gcc-mingw-w64-i686 g++-mingw-w64-i686 \
     gcc-arm-linux-gnueabihf g++-arm-linux-gnueabihf \
     python3-pip
 
