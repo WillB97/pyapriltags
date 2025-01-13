@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -e
 # repository is mounted at /apriltag, build files are under /builds
 # built shared libraries are stored under /dist, wheels are stored in /out
 
@@ -6,7 +6,7 @@
 
 mkdir -p \
     /{builds,dist}/{win64,win32,mac_aarch64,mac_amd64,linux_amd64,linux_aarch64,linux_armhf}
-mkdir out
+mkdir -p out
 
 COMMON_CMAKE_ARGS="-DBUILD_SHARED_LIBS=ON -DCMAKE_C_COMPILER_WORKS=1 -DCMAKE_CXX_COMPILER_WORKS=1 -DCMAKE_BUILD_TYPE=Release -DBUILD_PYTHON_WRAPPER=OFF -DBUILD_EXAMPLES=OFF"
 
