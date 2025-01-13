@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -e
 # repository is mounted at /apriltag, build files are under /builds
 # built shared libraries are stored under /dist, wheels are stored in /out
 
@@ -6,7 +6,7 @@
 
 mkdir -p \
     /{builds,dist}/{win64,win32,mac_aarch64,mac_amd64,linux_amd64,linux_aarch64,linux_armhf}
-mkdir out
+mkdir -p out
 
 COMMON_CMAKE_ARGS="-DBUILD_SHARED_LIBS=ON -DCMAKE_C_COMPILER_WORKS=1 -DCMAKE_CXX_COMPILER_WORKS=1 -DCMAKE_BUILD_TYPE=Release -DBUILD_PYTHON_WRAPPER=OFF -DBUILD_EXAMPLES=OFF"
 
@@ -18,6 +18,12 @@ do_compile() {
         $COMMON_CMAKE_ARGS /apriltag/apriltags || return
     cmake --build . --config Release || return
     cp -L libapriltag.* /dist/$1
+}
+
+get_glibc_version() {
+    # $1 is the compiler
+    libc_link=$($1 -print-file-name=libc.so.6)
+    readlink -f $libc_link | sed -E 's/.*libc-([0-9]+)\.([0-9]+)\.so/\1_\2/'
 }
 
 build_wheel() {
@@ -43,9 +49,14 @@ do_compile linux_armhf arm-linux-gnueabihf-gcc arm-linux-gnueabihf-g++ "-DCMAKE_
 
 # build wheels
 cd /apriltag
-build_wheel linux_aarch64 libapriltag.so manylinux2014_aarch64
-build_wheel linux_amd64 libapriltag.so manylinux2010_x86_64
-build_wheel linux_armhf libapriltag.so manylinux2014_armv7l
+if [[ "$ARCH" == "x86_64" ]]; then
+    build_wheel linux_aarch64 libapriltag.so manylinux_$(get_glibc_version aarch64-linux-gnu-gcc)_aarch64
+    build_wheel linux_amd64 libapriltag.so manylinux_$(get_glibc_version gcc)_x86_64
+else
+    build_wheel linux_aarch64 libapriltag.so manylinux_$(get_glibc_version gcc)_aarch64
+    build_wheel linux_amd64 libapriltag.so manylinux_$(get_glibc_version x86_64-linux-gnu-gcc)_x86_64
+fi
+build_wheel linux_armhf libapriltag.so manylinux_$(get_glibc_version arm-linux-gnueabihf-gcc)_armv7l
 build_wheel win64 libapriltag.dll win-amd64
 build_wheel win32 libapriltag.dll win32
 build_wheel mac_aarch64 libapriltag.dylib macosx_11_0_arm64
