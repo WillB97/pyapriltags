@@ -2,11 +2,9 @@ ROOT=$(dir $(abspath $(firstword $(MAKEFILE_LIST))))
 
 .PHONY: build upload clean release-all
 
+all: docker-build build
+
 build:
-	# create build environment
-	docker build \
-		-t pyapriltags:wheel-python3 \
-		${ROOT}
 	# create wheel destination directory
 	mkdir -p ${ROOT}/dist
 	# build wheel
@@ -15,6 +13,12 @@ build:
 		-v ${ROOT}:/apriltag \
 		-v ${ROOT}/dist:/out \
 		pyapriltags:wheel-python3
+
+docker-build:
+	# create build environment
+	docker build \
+		-t pyapriltags:wheel-python3 \
+		${ROOT}
 
 upload:
 	twine upload ${ROOT}/dist/*
