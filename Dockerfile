@@ -29,7 +29,7 @@ RUN if [ "$(uname -m)" = "x86_64" ]; then \
 RUN pip install numpy
 
 # support from win7 in mingw
-ENV CXXFLAGS="-DWINVER=0x0600 -D_WIN32_WINNT=0x0600"
+ENV CFLAGS="-DWINVER=0x0600 -D_WIN32_WINNT=0x0600"
 
 # install building script
 COPY ./assets/build.sh /build.sh
