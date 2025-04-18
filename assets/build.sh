@@ -63,3 +63,7 @@ build_wheel win64 libapriltag.dll win-amd64
 build_wheel win32 libapriltag.dll win32
 build_wheel mac_aarch64 libapriltag.dylib macosx_11_0_arm64
 build_wheel mac_amd64 libapriltag.dylib macosx_11_0_x86_64
+
+# Bugfix for win64
+fixed_name="$(echo /out/*-win-amd64.whl | sed 's/-win-amd64.whl$/-win_amd64.whl/')"
+mv /out/*-win-amd64.whl "$fixed_name"
