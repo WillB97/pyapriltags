@@ -26,7 +26,7 @@ RUN if [ "$(uname -m)" = "x86_64" ]; then \
     fi
 
 # install python libraries
-RUN pip install numpy
+RUN pip install "numpy==1.24.4" uv
 
 # support from win7 in mingw
 ENV CFLAGS="-DWINVER=0x0600 -D_WIN32_WINNT=0x0600"
