@@ -6,6 +6,9 @@
 
 mkdir -p /out
 
+# Patch for incorrectly cased include in 3.4.3
+for f in $(find / -name winsock2.h); do cd $(dirname $f); ln -s winsock2.h Winsock2.h; done
+
 COMMON_CMAKE_ARGS="-DBUILD_SHARED_LIBS=ON -DCMAKE_C_COMPILER_WORKS=1 -DCMAKE_CXX_COMPILER_WORKS=1 -DCMAKE_BUILD_TYPE=Release -DBUILD_PYTHON_WRAPPER=OFF -DBUILD_EXAMPLES=OFF"
 
 do_compile() {
