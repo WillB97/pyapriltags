@@ -35,4 +35,4 @@ ENV CFLAGS="-DWINVER=0x0600 -D_WIN32_WINNT=0x0600"
 COPY ./assets/build.sh /build.sh
 
 # define command
-CMD /build.sh
+CMD [ "/build.sh" ]
