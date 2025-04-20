@@ -4,6 +4,9 @@ on:
   push:
   workflow_dispatch:
 
+env:
+  IMAGE_NAME: willb97/pyapriltags
+
 jobs:
   build-image:
     runs-on: ubuntu-latest
@@ -43,6 +46,7 @@ jobs:
         name: docker-image
         path: ${{ runner.temp }}/docker-image.tar.gz
   build-wheels:
+    needs: build-image
     permissions:
       id-token: write  # IMPORTANT: this permission is mandatory for trusted publishing
     runs-on: ubuntu-latest
