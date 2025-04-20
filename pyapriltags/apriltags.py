@@ -41,7 +41,7 @@ class _Matd(ctypes.Structure):
     _fields_ = [
         ('nrows', ctypes.c_int),
         ('ncols', ctypes.c_int),
-        ('data', ctypes.c_double * 1),
+        ('data', ctypes.POINTER(ctypes.c_double)),
     ]
 
 
@@ -133,7 +133,7 @@ def _image_u8_get_array(img_ptr):
 
 def _matd_get_array(mat_ptr):
     return _ptr_to_array2d(ctypes.c_double,
-                           mat_ptr.contents.data,
+                           mat_ptr.contents.data.contents,
                            int(mat_ptr.contents.nrows),
                            int(mat_ptr.contents.ncols))
 
