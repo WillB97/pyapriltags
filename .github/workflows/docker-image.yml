@@ -1,6 +1,10 @@
 name: Docker Image CI
 
 on:
+  push:
+    paths:
+      - Dockerfile
+      - assets/build.sh
   workflow_dispatch:
 
 env:
