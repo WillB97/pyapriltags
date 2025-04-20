@@ -10,8 +10,6 @@ env:
 jobs:
   build-image:
     runs-on: ubuntu-latest
-    permissions:
-      packages: write
     steps:
     - uses: actions/checkout@v4
       with:
@@ -51,6 +49,7 @@ jobs:
     needs: build-image
     permissions:
       id-token: write  # IMPORTANT: this permission is mandatory for trusted publishing
+      packages: write  # Allow the action to publish to the GitHub Container Registry
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
