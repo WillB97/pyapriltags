@@ -88,5 +88,4 @@ jobs:
     - name: Push docker image
       # if: ${{ github.ref_type == 'tag' }}
       run: |
-        WHEEL_VERSION=ghcr.io/$IMAGE_NAME:$(git describe --tags --always),ghcr.io/$IMAGE_NAME:latest
-        docker image push $WHEEL_VERSION
+        docker image push --all-tags ghcr.io/$IMAGE_NAME
