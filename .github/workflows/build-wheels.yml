@@ -2,8 +2,46 @@ name: Build Wheels
 
 on:
   push:
+  workflow_dispatch:
 
 jobs:
+  build-image:
+    runs-on: ubuntu-latest
+    permissions:
+      packages: write
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        submodules: recursive
+        fetch-depth: 0
+        fetch-tags: true
+    - name: Generate release version
+      id: release_version
+      run: |
+        echo "WHEEL_VERSION=ghcr.io/$IMAGE_NAME:$(git describe --tags --always),ghcr.io/$IMAGE_NAME:latest" >> "$GITHUB_OUTPUT"
+    - name: Extract metadata (tags, labels) for Docker
+      id: meta
+      uses: docker/metadata-action@v5
+      with:
+        images: ghcr.io/${{ env.IMAGE_NAME }}
+    - name: Build Docker image
+      id: push
+      uses: docker/build-push-action@v6
+      with:
+        context: .
+        # push: false
+        tags: ${{ steps.release_version.outputs.WHEEL_VERSION }}
+        labels: ${{ steps.meta.outputs.labels }}
+        outputs: type=docker,dest=${{ runner.temp }}/docker-image.tar
+    - name: Compress docker image
+      run: |
+        mkdir -p ${{ runner.temp }}
+        gzip ${{ runner.temp }}/docker-image.tar
+    - name: Store docker image
+      uses: actions/upload-artifact@v4
+      with:
+        name: docker-image
+        path: ${{ runner.temp }}/docker-image.tar.gz
   build-wheels:
     permissions:
       id-token: write  # IMPORTANT: this permission is mandatory for trusted publishing
@@ -14,8 +52,16 @@ jobs:
         submodules: recursive
         fetch-depth: 0
         fetch-tags: true
-    - name: Pull the latest image
-      run: docker pull ghcr.io/willb97/pyapriltags:latest
+    - name: Download docker image
+      uses: actions/download-artifact@v4
+      with:
+        name: docker-image
+        path: ${{ runner.temp }}
+    - name: Load image
+      run: |
+        gunzip ${{ runner.temp }}/docker-image.tar.gz
+        docker load --input ${{ runner.temp }}/docker-image.tar
+        docker image ls -a
     - name: Build the wheels
       run: docker run --rm -v .:/apriltag -v ./dist:/out ghcr.io/willb97/pyapriltags:latest
     - uses: actions/upload-artifact@v4
@@ -26,3 +72,15 @@ jobs:
     - name: Publish to PyPi
       if: ${{ github.ref_type	== 'tag' }}
       uses: pypa/gh-action-pypi-publish@release/v1
+    - name: 'Login to GitHub Container Registry'
+      # if: ${{ github.ref_type == 'tag' }}
+      uses: docker/login-action@v3
+      with:
+        registry: ghcr.io
+        username: ${{github.actor}}
+        password: ${{secrets.GITHUB_TOKEN}}
+    - name: Push docker image
+      # if: ${{ github.ref_type == 'tag' }}
+      run: |
+        WHEEL_VERSION=ghcr.io/$IMAGE_NAME:$(git describe --tags --always),ghcr.io/$IMAGE_NAME:latest
+        docker image push $WHEEL_VERSION
